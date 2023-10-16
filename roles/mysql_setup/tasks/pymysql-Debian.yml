@@ -1,0 +1,5 @@
+---
+- name: PyMySQL package (apt)
+  apt:
+    name: python3-pymysql
+    state: latest

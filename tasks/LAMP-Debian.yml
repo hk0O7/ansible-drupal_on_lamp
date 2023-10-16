@@ -1,0 +1,12 @@
+- name: LAMP stack packages installed (apt)
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+      - php-xml
+      - php-gd
+      - php-mbstring
+      - php-mysql
+      - mysql-server
+    state: present
+  #notify: 'drupal_install : restart_apache'

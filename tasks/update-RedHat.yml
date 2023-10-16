@@ -1,0 +1,20 @@
+---
+- name: Up-to-date system (dnf)
+  dnf:
+    name: "*"
+    state: latest
+    update_cache: yes
+- name: dnf-utils installed (RH)
+  dnf:
+    name: dnf-utils
+    state: present
+- name: Check if reboot is required by upgrades (RH)
+  command:
+    cmd: needs-restarting -r
+  check_mode: no
+  failed_when: no
+  changed_when: no
+  register: reboot_check
+- name: Reboot system if required (RH)
+  reboot:
+  when: reboot_check.rc == 1

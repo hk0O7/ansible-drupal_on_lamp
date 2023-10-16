@@ -1,0 +1,13 @@
+---
+- name: Apache site config directories (RH)
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "/etc/{{ apache_service }}/sites-available"
+    - "/etc/{{ apache_service }}/sites-enabled"
+- name: Apache sites-enabled included (RH)
+  copy:
+    content: 'IncludeOptional sites-enabled/*.conf'
+    dest: "/etc/{{ apache_service }}/conf.d/sites-enabled.conf"
+  notify: restart_apache

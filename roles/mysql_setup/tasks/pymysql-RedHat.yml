@@ -1,0 +1,5 @@
+---
+- name: PyMySQL package (dnf)
+  dnf:
+    name: python3-PyMySQL
+    state: latest

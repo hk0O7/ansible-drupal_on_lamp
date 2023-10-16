@@ -1,0 +1,29 @@
+---
+- name: Remi RPM repo pubkeys (dnf)
+  rpm_key:
+    key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi{{ item }}"
+    state: present
+  with_items:
+    - ""
+    - "{{ range(ansible_date_time.year|int - 5, ansible_date_time.year|int + 1) }}"
+- name: Remi RPM repo installed (dnf)
+  dnf:
+    name: https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+    state: present
+- name: EPEL RPM repo up-to-date (dnf)
+  dnf:
+    name: epel-release
+    state: latest
+- name: LAMP stack packages installed (dnf)
+  dnf:
+    enablerepo: remi
+    name:
+      - httpd
+      - php81-php
+      - php81-php-xml
+      - php81-php-gd
+      - php81-php-mbstring
+      - php81-php-mysqlnd
+      - mysql-server
+    state: present
+  #notify: 'drupal_install : restart_apache'

@@ -1,0 +1,14 @@
+---
+- include_vars: "{{ ansible_os_family }}.yml"
+- include_tasks: "pymysql-{{ ansible_os_family }}.yml"
+- name: database for drupal
+  mysql_db:
+    name: drupal
+    login_unix_socket: "{{ mysql_socket }}"
+- name: MySQL user for drupal database
+  mysql_user:
+    name: "{{ drupal_mysql_user }}"
+    host: localhost
+    password: "{{ drupal_mysql_pass }}"
+    priv: "{{ drupal_mysql_user }}.*:ALL"
+    login_unix_socket: "{{ mysql_socket }}"

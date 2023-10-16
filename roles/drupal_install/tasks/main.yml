@@ -1,0 +1,48 @@
+---
+- include_vars: "{{ ansible_os_family }}.yml"
+- debug: var=apache_user
+- name: Main directory
+  file:
+    path: "{{ drupal_dir }}"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_user }}"
+- name: Preexisting installation check
+  stat:
+    path: "{{ drupal_dir }}/index.php"
+  register: drupal_index
+- name: Download & extract latest Drupal tarball if required
+  when: not drupal_index.stat.exists
+  unarchive:
+    remote_src: yes
+    src: https://www.drupal.org/download-latest/tar.gz
+    dest: "{{ drupal_dir }}"
+    extra_opts: [ --strip-components=1 ]
+    owner: "{{ apache_user }}"
+    group: "{{ apache_user }}"
+  notify: "drupal_install : restart_apache"
+- include_tasks: RedHat.yml
+  when: ansible_os_family == "RedHat"
+- name: drupal.conf Apache site config
+  tags: apache_conf_file
+  template:
+    src: drupal.conf.j2
+    dest: "/etc/{{ apache_service }}/sites-available/drupal.conf"
+  notify: "drupal_install : restart_apache"
+- name: Default Apache site disabled
+  file:
+    path: "/etc/{{ apache_service }}/sites-enabled/000-default.conf"
+    state: absent
+  notify: "drupal_install : restart_apache"
+- name: '"rewrite" Apache module enabled'
+  apache2_module:
+    name: rewrite
+    ignore_configcheck: true
+  notify: "drupal_install : restart_apache"
+- name: drupal.conf Apache site enabled
+  file:
+    path: "/etc/{{ apache_service }}/sites-enabled/drupal.conf"
+    state: link
+    src: ../sites-available/drupal.conf
+  notify: "drupal_install : restart_apache"
+- meta: flush_handlers
