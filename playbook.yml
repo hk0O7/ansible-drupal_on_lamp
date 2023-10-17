@@ -5,7 +5,6 @@
   vars_files:
     - vars/mysql_user_creds.yml
     - vars/drupal_admin_creds.yml
-    - vars/{{ ansible_os_family }}.yml
   vars:
     - drupal_site_basename: "Ansible'd Drupal site"
     - apache_root_dir: /var/www/html
@@ -13,21 +12,12 @@
     - drupal_site_name: |-
         {{ drupal_site_basename }} [{{ ansible_hostname }} (on {{ ansible_os_family }})]
   pre_tasks:
-    - include_tasks: tasks/update-{{ansible_os_family}}.yml
     - name: No nano
       package:
         name: nano
         state: absent
-    - include_tasks: tasks/LAMP-{{ansible_os_family}}.yml
-    - name: Apache & mysql services enabled & running
-      service:
-        name: "{{ item }}"
-        state: started
-        enabled: yes
-      with_items:
-        - "{{ apache_service }}"
-        - "{{ mysql_service }}"
   roles:
+    - lamp_packages
     - drupal_install
     - mysql_setup
   tasks:

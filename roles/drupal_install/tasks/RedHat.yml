@@ -10,4 +10,4 @@
   copy:
     content: 'IncludeOptional sites-enabled/*.conf'
     dest: "/etc/{{ apache_service }}/conf.d/sites-enabled.conf"
-  notify: restart_apache
+  notify: 'lamp_packages : restart_apache'

@@ -1,0 +1,12 @@
+---
+- name: Up-to-date system (apt)
+  apt:
+    cache_valid_time: 3600
+    upgrade: dist
+- name: Check if reboot is required by upgrades (Deb)
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required_check
+- name: Reboot system if required (Deb)
+  reboot:
+  when: reboot_required_check.stat.exists
